@@ -142,6 +142,6 @@ const handleLogout = async () => {
 }
 .dropdown-toggle { cursor: pointer; }
 .nav-link { text-decoration: none; padding: 0.5rem 1rem; }
-.navbar-nav { list-style: none; display: flex; padding-left: 0; margin-bottom: 0; }
+.navbar-nav { list-style: none; display: flex; padding-left: 0; margin-bottom: 0; margin-top: 0; }
 .navbar-collapse { flex-grow: 1; display: flex; }
 </style>

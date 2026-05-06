@@ -1,36 +1,42 @@
-import axios from 'axios';
+import axios from 'axios'
 
 const api = axios.create({
-    baseURL: 'http://127.0.0.1:8100/api',
-    withCredentials: true,
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    }
-});
+  baseURL: 'http://127.0.0.1:8001/api',
+  withCredentials: true,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+})
 
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
 
-api.interceptors.response.use((response) => {
-    return response;
-}, (error) => {
+api.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
     if (error.response && error.response.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        // Tránh loop re-routing nếu đang ở /login
-        if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
-        }
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      // Tránh loop re-routing nếu đang ở /login
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
-    return Promise.reject(error);
-});
+    return Promise.reject(error)
+  },
+)
 
-export default api;
+export default api

@@ -109,8 +109,35 @@ h1, h2, h3, h4, h5, h6, .brand-text {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-dark) !important;
+  text-decoration: none !important;
 }
 
 .navbar-brand span {
   color: var(--color-gold);
+}
+
+a {
+  text-decoration: none !important;
+}
+
+.nav-link {
+  text-decoration: none !important;
+}
+
+button:focus, .btn:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.btn-link {
+  border: none !important;
+  text-decoration: none !important;
+}
+
+.btn-premium, .btn-premium-outline {
+  border: none;
+}
+
+.btn-premium-outline {
+  border: 1px solid var(--color-dark);
 }
