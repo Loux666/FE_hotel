@@ -378,6 +378,7 @@ import { useRoute, useRouter } from 'vue-router'
 import hotelService from '@/services/hotelService'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 import Header from '@/components/home/Header.vue'
 import flatpickr from 'flatpickr'
 
@@ -385,6 +386,7 @@ const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
 const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
 
 const hotel = ref(null)
 const isAdding = ref(null)
@@ -504,7 +506,7 @@ const addToCart = async (room) => {
   }
 
   if (!checkinDate.value || !checkoutDate.value) {
-    alert('Vui lòng chọn ngày nhận và trả phòng trước khi thêm vào giỏ!')
+    notificationStore.warning('Vui lòng chọn ngày nhận và trả phòng trước khi thêm vào giỏ!')
     scrollToRooms()
     return
   }
@@ -517,9 +519,9 @@ const addToCart = async (room) => {
       checkout: checkoutDate.value,
       number_of_guests: normalizeGuests(room),
     })
-    alert('Đã thêm phòng vào giỏ hàng!')
+    notificationStore.success('Đã thêm phòng vào giỏ hàng!')
   } catch (error) {
-    alert(error.response?.data?.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng')
+    notificationStore.error(error.response?.data?.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng')
   } finally {
     isAdding.value = null
   }

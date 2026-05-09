@@ -190,6 +190,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 import { useRouter } from 'vue-router'
 import api from '@/api/axios'
 import Header from '@/components/home/Header.vue'
@@ -197,6 +198,7 @@ import Header from '@/components/home/Header.vue'
 const cartStore = useCartStore()
 const authStore = useAuthStore()
 const router = useRouter()
+const notificationStore = useNotificationStore()
 const isProcessing = ref(false)
 
 const form = reactive({
@@ -218,7 +220,7 @@ const formatPrice = (price) => {
 
 const processBooking = async () => {
   if (!form.guest_name || !form.guest_email || !form.guest_phone) {
-    alert('Vui lòng điền đủ thông tin liên hệ!')
+    notificationStore.warning('Vui lòng điền đủ thông tin liên hệ!')
     return
   }
 
@@ -246,7 +248,7 @@ const processBooking = async () => {
       router.push(`/payment/status?success=true&booking_id=${bookingId}`)
     }
   } catch (error) {
-    alert(error.response?.data?.message || 'Có lỗi xảy ra khi xử lý đặt phòng')
+    notificationStore.error(error.response?.data?.message || 'Có lỗi xảy ra khi xử lý đặt phòng')
   } finally {
     isProcessing.value = false
   }

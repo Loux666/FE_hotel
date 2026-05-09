@@ -64,11 +64,13 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import hotelService from '@/services/hotelService';
+import { useNotificationStore } from '@/stores/notification';
 import Header from '@/components/home/Header.vue';
 import Footer from '@/components/home/Footer.vue';
 
 const coupons = ref([]);
 const isLoading = ref(true);
+const notificationStore = useNotificationStore();
 
 onMounted(async () => {
   try {
@@ -85,7 +87,7 @@ const formatDate = (date) => new Date(date).toLocaleDateString('vi-VN');
 
 const copyCode = (code) => {
   navigator.clipboard.writeText(code);
-  alert(`Đã sao chép mã: ${code}`);
+  notificationStore.success(`Đã sao chép mã: ${code}`);
 };
 </script>
 

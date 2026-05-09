@@ -345,10 +345,12 @@
 <script setup>
 import { onMounted, ref, reactive } from 'vue'
 import { useCartStore } from '@/stores/cart'
+import { useNotificationStore } from '@/stores/notification'
 import Header from '@/components/home/Header.vue'
 import api from '@/api/axios'
 
 const cartStore = useCartStore()
+const notificationStore = useNotificationStore()
 const activeTab = ref('cart')
 const bookings = ref([])
 const isLoadingBookings = ref(false)
@@ -392,7 +394,7 @@ const removeItem = async (id) => {
     try {
       await cartStore.removeFromCart(id)
     } catch (error) {
-      alert('Có lỗi xảy ra khi xóa mục')
+      notificationStore.error('Có lỗi xảy ra khi xóa mục')
     }
   }
 }
@@ -412,9 +414,9 @@ const cancelBooking = async (bookingId) => {
   try {
     await api.delete(`/bookings/${bookingId}`)
     await fetchBookings()
-    alert('Hủy đơn đặt phòng thành công')
+    notificationStore.success('Hủy đơn đặt phòng thành công')
   } catch (error) {
-    alert(error.response?.data?.message || 'Có lỗi xảy ra khi hủy đơn')
+    notificationStore.error(error.response?.data?.message || 'Có lỗi xảy ra khi hủy đơn')
   } finally {
     isCancelling.value = false
   }
@@ -433,12 +435,12 @@ const submitFeedback = async () => {
     !selectedBooking.value.details ||
     !selectedBooking.value.details.length
   ) {
-    alert('Không tìm thấy chi tiết đơn đặt phòng')
+    notificationStore.error('Không tìm thấy chi tiết đơn đặt phòng')
     return
   }
 
   if (feedbackForm.rating < 1 || feedbackForm.content.trim().length === 0) {
-    alert('Vui lòng chọn đánh giá sao và viết bình luận')
+    notificationStore.warning('Vui lòng chọn đánh giá sao và viết bình luận')
     return
   }
 
@@ -453,11 +455,11 @@ const submitFeedback = async () => {
       rating: feedbackForm.rating,
       content: feedbackForm.content,
     })
-    alert('Cảm ơn bạn đã đánh giá!')
+    notificationStore.success('Cảm ơn bạn đã đánh giá!')
     showFeedbackModal.value = false
     await fetchBookings()
   } catch (error) {
-    alert(error.response?.data?.message || 'Có lỗi xảy ra khi gửi đánh giá')
+    notificationStore.error(error.response?.data?.message || 'Có lỗi xảy ra khi gửi đánh giá')
   } finally {
     isSubmittingFeedback.value = false
   }

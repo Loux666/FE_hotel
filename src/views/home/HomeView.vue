@@ -305,6 +305,7 @@
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useHotelStore } from '@/stores/hotel';
+import { useNotificationStore } from '@/stores/notification';
 import Header from '@/components/home/Header.vue';
 import Footer from '@/components/home/Footer.vue';
 import flatpickr from 'flatpickr';
@@ -312,6 +313,7 @@ import roomService from '@/services/roomService';
 
 const hotelStore = useHotelStore();
 const router = useRouter();
+const notificationStore = useNotificationStore();
 
 const searchQuery = ref('');
 const roomType = ref('');
@@ -383,7 +385,7 @@ onMounted(() => {
 
 const searchHotels = () => {
   if (!searchQuery.value || !checkinDate.value || !checkoutDate.value) {
-    alert('Vui lòng điền đầy đủ: Địa điểm, Ngày nhận và Ngày trả phòng!');
+    notificationStore.warning('Vui lòng điền đầy đủ: Địa điểm, Ngày nhận và Ngày trả phòng!');
     return;
   }
 

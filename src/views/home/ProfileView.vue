@@ -77,11 +77,13 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useNotificationStore } from '@/stores/notification';
 import authService from '@/services/authService';
 import Header from '@/components/home/Header.vue';
 import Footer from '@/components/home/Footer.vue';
 
 const authStore = useAuthStore();
+const notificationStore = useNotificationStore();
 const isUpdating = ref(false);
 
 const form = reactive({
@@ -105,11 +107,11 @@ const handleUpdate = async () => {
   try {
     const { data } = await authService.updateProfile(form);
     authStore.setAuthData(data.data, authStore.token);
-    alert('Cập nhật thông tin thành công!');
+    notificationStore.success('Cập nhật thông tin thành công!');
     form.password = '';
     form.password_confirmation = '';
   } catch (error) {
-    alert(error.response?.data?.message || 'Cập nhật thất bại.');
+    notificationStore.error(error.response?.data?.message || 'Cập nhật thất bại.');
   } finally {
     isUpdating.value = false;
   }

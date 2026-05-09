@@ -86,10 +86,12 @@ import { onMounted, ref } from 'vue';
 import cartService from '@/services/cartService';
 import Header from '@/components/home/Header.vue';
 import Footer from '@/components/home/Footer.vue';
+import { useNotificationStore } from '@/stores/notification';
 import api from '@/api/axios';
 
 const bookings = ref([]);
 const isLoading = ref(true);
+const notificationStore = useNotificationStore();
 
 const fetchHistory = async () => {
   isLoading.value = true;
@@ -132,7 +134,7 @@ const rePay = async (booking) => {
         });
         window.location.href = data.data.payment_url;
     } catch (error) {
-        alert('Có lỗi khi khởi tạo lại thanh toán.');
+        notificationStore.error('Có lỗi khi khởi tạo lại thanh toán.');
     }
 };
 </script>

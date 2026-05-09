@@ -98,9 +98,11 @@
 import { reactive, ref } from 'vue';
 import Header from '@/components/home/Header.vue';
 import Footer from '@/components/home/Footer.vue';
+import { useNotificationStore } from '@/stores/notification';
 import api from '@/api/axios';
 
 const isSubmitting = ref(false);
+const notificationStore = useNotificationStore();
 const form = reactive({
   name: '',
   email: '',
@@ -112,13 +114,13 @@ const submitContact = async () => {
   isSubmitting.value = true;
   try {
     await api.post('/contact', form);
-    alert('Cảm ơn bạn! Tin nhắn của bạn đã được gửi thành công.');
+    notificationStore.success('Cảm ơn bạn! Tin nhắn của bạn đã được gửi thành công.');
     form.name = '';
     form.email = '';
     form.subject = '';
     form.message = '';
   } catch (error) {
-    alert('Gửi tin nhắn thất bại, vui lòng thử lại sau.');
+    notificationStore.error('Gửi tin nhắn thất bại, vui lòng thử lại sau.');
   } finally {
     isSubmitting.value = false;
   }
