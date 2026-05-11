@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const api = axios.create({
-  // baseURL: 'https://hotelbooking.click/api',
-  baseURL: 'http://hotelbooking/api',
+  baseURL: 'https://hotelbooking.click/api',
+  // baseURL: 'http://hotelbooking/api',
   withCredentials: true,
   headers: {
     Accept: 'application/json',
