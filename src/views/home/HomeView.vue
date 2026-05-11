@@ -16,9 +16,31 @@
                 <form @submit.prevent="searchHotels" class="search-form">
                   <!-- Row 1: Location, Room Type, Dates -->
                   <div class="search-row">
-                    <div class="search-field">
+                    <div class="search-field position-relative">
                       <label class="search-label"><i class="fas fa-map-marker-alt"></i> Điểm đến</label>
-                      <input v-model="searchQuery" type="text" class="search-input" placeholder="Ví dụ: Hà Nội..." />
+                      <input 
+                        v-model="searchQuery" 
+                        type="text" 
+                        class="search-input" 
+                        placeholder="Ví dụ: Hà Nội..." 
+                        @focus="onSearchFocus"
+                        @blur="onSearchBlur"
+                      />
+                      
+                      <!-- Suggestions Dropdown -->
+                      <div v-if="showSuggestions && filteredCities.length > 0" class="suggestions-dropdown shadow-lg">
+                        <div 
+                          v-for="(city, index) in filteredCities" 
+                          :key="index" 
+                          class="suggestion-item"
+                          @mousedown.prevent="selectSuggestion(city)"
+                        >
+                          <i class="fas fa-map-marker-alt text-gold me-3"></i>
+                          <div class="suggestion-content">
+                            <span class="suggestion-text">{{ city }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <div class="search-field">
                       <label class="search-label"><i class="fas fa-bed"></i> Loại phòng</label>
@@ -302,8 +324,9 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import api from '@/api/axios';
 import { useHotelStore } from '@/stores/hotel';
 import { useNotificationStore } from '@/stores/notification';
 import Header from '@/components/home/Header.vue';
@@ -321,8 +344,29 @@ const guests = ref('2');
 const checkinDate = ref('');
 const checkoutDate = ref('');
 const recommendedRooms = ref([]);
-const isLoadingRooms = ref(true);
 const cityCarousel = ref(null);
+
+// Search suggestions state (Optimized: Prefetch & Local Filter)
+const allCities = ref([]);
+const showSuggestions = ref(false);
+
+const fetchAllCities = async () => {
+    try {
+        const { data } = await api.get('/search/cities');
+        allCities.value = data.data || [];
+    } catch (error) {
+        console.error('Error fetching cities:', error);
+    }
+};
+
+const filteredCities = computed(() => {
+    if (searchQuery.value.length < 1) return [];
+    const query = searchQuery.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return allCities.value.filter(city => {
+        const normalizedCity = city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return normalizedCity.includes(query);
+    }).slice(0, 8); // Giới hạn 8 kết quả
+});
 
 const topCities = [
   { name: 'Hà Nội', image: '/images/hanoi.jpg' },
@@ -348,6 +392,33 @@ const fetchRecommendedRooms = async () => {
     }
 };
 
+const onSearchFocus = () => {
+    if (filteredCities.value.length > 0) {
+        showSuggestions.value = true;
+    }
+};
+
+const onSearchBlur = () => {
+    // Dùng mousedown.prevent ở template để tránh việc blur làm mất dropdown trước khi click
+    setTimeout(() => {
+        showSuggestions.value = false;
+    }, 200);
+};
+
+const selectSuggestion = (city) => {
+    searchQuery.value = city;
+    showSuggestions.value = false;
+};
+
+// Theo dõi thay đổi query để hiện dropdown
+watch(searchQuery, (newVal) => {
+    if (newVal.length > 0) {
+        showSuggestions.value = true;
+    } else {
+        showSuggestions.value = false;
+    }
+});
+
 const goToCity = (city) => {
     hotelStore.setSearchParams({ city });
     router.push({ path: '/hotels', query: { city } });
@@ -361,18 +432,31 @@ const scrollCarousel = (direction) => {
 
 onMounted(() => {
   fetchRecommendedRooms();
+  fetchAllCities(); // Tải danh sách thành phố 1 lần duy nhất
   
-  flatpickr("#checkin-date", {
+  const checkinPicker = flatpickr("#checkin-date", {
     minDate: "today",
     dateFormat: "Y-m-d",
     onChange: (selectedDates) => {
         if (selectedDates.length > 0) {
-            checkinDate.value = selectedDates[0].toISOString().split('T')[0];
+            const d = selectedDates[0];
+            checkinDate.value = d.toISOString().split('T')[0];
+            
+            // Cập nhật minDate cho ngày trả phòng: ít nhất là 1 ngày sau ngày nhận
+            const nextDay = new Date(d);
+            nextDay.setDate(d.getDate() + 1);
+            checkoutPicker.set('minDate', nextDay);
+            
+            // Nếu ngày trả hiện tại <= ngày nhận mới chọn -> xóa ngày trả
+            if (checkoutDate.value && new Date(checkoutDate.value) <= d) {
+                checkoutDate.value = "";
+                checkoutPicker.clear();
+            }
         }
     }
   });
 
-  flatpickr("#checkout-date", {
+  const checkoutPicker = flatpickr("#checkout-date", {
     minDate: "today",
     dateFormat: "Y-m-d",
     onChange: (selectedDates) => {
@@ -637,6 +721,49 @@ const searchHotels = () => {
   font-size: 1.25rem;
   cursor: pointer;
 }
+
+/* Search Suggestions Styles */
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  margin-top: 8px;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+.suggestion-item:hover {
+  background: #f8f9fa;
+}
+.suggestion-text {
+  font-weight: 500;
+  color: var(--color-darker);
+  font-size: 0.95rem;
+}
+.suggestion-subtext {
+  color: #888;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+.text-gold {
+  color: var(--color-gold) !important;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   height: 8px;
 }

@@ -440,7 +440,7 @@ onMounted(() => {
   }
 
   const initPickers = () => {
-    flatpickr('#detail-checkin', {
+    const inPicker = flatpickr('#detail-checkin', {
       minDate: 'today',
       dateFormat: 'Y-m-d',
       defaultDate: checkinDate.value || null,
@@ -450,12 +450,24 @@ onMounted(() => {
           checkinDate.value = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
             .toISOString()
             .split('T')[0]
+          
+          // Cập nhật minDate cho checkout
+          const nextDay = new Date(d);
+          nextDay.setDate(d.getDate() + 1);
+          outPicker.set('minDate', nextDay);
+
+          // Nếu checkout cũ <= checkin mới -> xóa
+          if (checkoutDate.value && new Date(checkoutDate.value) <= d) {
+            checkoutDate.value = '';
+            outPicker.clear();
+          }
+          
           datesSelected.value = !!(checkinDate.value && checkoutDate.value)
         }
       },
     })
-    flatpickr('#detail-checkout', {
-      minDate: 'today',
+    const outPicker = flatpickr('#detail-checkout', {
+      minDate: checkinDate.value ? new Date(new Date(checkinDate.value).getTime() + 86400000) : 'today',
       dateFormat: 'Y-m-d',
       defaultDate: checkoutDate.value || null,
       onChange: (selectedDates) => {
