@@ -5,7 +5,7 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-6">
-          <div class="glass-panel p-5 bg-white text-center shadow-lg" style="border-radius: 32px">
+          <div class="glass-panel p-4 p-md-5 bg-white text-center shadow-lg mx-auto" style="border-radius: 32px; max-width: 500px;">
             <div v-if="isLoading" class="py-5">
               <div class="spinner-border text-gold" role="status"></div>
               <p class="text-muted mt-3 mb-0">Đang xác minh thanh toán...</p>
@@ -16,8 +16,8 @@
               <div class="mb-4 d-inline-block p-4 rounded-circle bg-success bg-opacity-10">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="80"
-                  height="80"
+                  width="60"
+                  height="60"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="#28a745"
@@ -29,29 +29,29 @@
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
               </div>
-              <h1 class="display-6 fw-bold mb-3 luxury-title">Đặt phòng thành công!</h1>
-              <p class="text-muted fs-5 mb-5 px-lg-5">
+              <h1 class="h3 fw-bold mb-3 luxury-title">Đặt phòng thành công!</h1>
+              <p class="text-muted small mb-5 px-md-3">
                 Cảm ơn bạn đã tin tưởng StayGo. Đơn đặt phòng của bạn đã được xác nhận. Chúng tôi đã
                 gửi thông tin chi tiết qua email.
               </p>
 
-              <div class="p-4 bg-light rounded-4 mb-5 text-start">
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="text-muted small uppercase fw-bold">Trạng thái</span>
-                  <span class="badge bg-success">Đã hoàn tất</span>
+              <div class="p-4 bg-light rounded-4 mb-5 text-start border border-white mx-auto" style="max-width: 400px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="text-muted extra-small text-uppercase fw-bold tracking-wider">Trạng thái</span>
+                  <span class="badge bg-success px-3 py-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">ĐÃ HOÀN TẤT</span>
                 </div>
-                <div class="d-flex justify-content-between">
-                  <span class="text-muted small uppercase fw-bold">Mã booking</span>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted extra-small text-uppercase fw-bold tracking-wider">Mã booking</span>
                   <span class="fw-bold text-dark">#{{ bookingId || 'N/A' }}</span>
                 </div>
               </div>
 
-              <div class="d-grid gap-3">
-                <RouterLink to="/hotels" class="btn btn-premium py-3"
-                  >Khám phá các điểm đến khác</RouterLink
+              <div class="d-flex flex-column gap-3 mx-auto" style="max-width: 400px;">
+                <RouterLink to="/hotels" class="btn btn-premium py-3 shadow-sm fw-bold small"
+                  >KHÁM PHÁ ĐIỂM ĐẾN KHÁC</RouterLink
                 >
-                <RouterLink to="/" class="btn btn-premium-outline py-3"
-                  >Quay lại trang chủ</RouterLink
+                <RouterLink to="/" class="btn btn-link text-dark text-decoration-none fw-bold small"
+                  >QUAY LẠI TRANG CHỦ</RouterLink
                 >
               </div>
             </div>
